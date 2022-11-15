@@ -17,13 +17,13 @@ defaults:
 
 jobs:
   version-bumps:
-    runs-on: ubuntu-latest  
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout
       uses: actions/checkout@v3
     - name: Get changed files
       id: changed-files
-      uses: tj-actions/changed-files@v34      
+      uses: tj-actions/changed-files@v34
       with:
         files: |
             VERSION
@@ -38,12 +38,12 @@ jobs:
     #   if: steps.changed-files-specific.outputs.any_changed == 'true'
     #   run: |
     #     echo "One or more files in the docs folder has changed."
-    #     echo "List all the files that have changed: ${{ steps.changed-files-specific.outputs.all_changed_files }}"        
+    #     echo "List all the files that have changed: ${{ steps.changed-files-specific.outputs.all_changed_files }}"
     - name: Fail and notify if not changed!
       if: steps.changed-files.outputs.any_changed != 'true'
       run: |
-        echo "VERSION file needs to be updated"  
-        exit 1          
+        echo "VERSION file needs to be updated"
+        exit 1
 
   # tfsec:
   #   name: "tfsec"
@@ -90,7 +90,7 @@ jobs:
   terraform-validate:
     name: "validate"
     runs-on: ubuntu-latest
-    needs: 
+    needs:
       - tflint
       - version-bumps
       - terraform-fmt
@@ -101,7 +101,7 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v1-node16
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}      
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: eu-west-3
 
     - name: terraform validate
@@ -112,7 +112,7 @@ jobs:
   terraform-plan:
     name: "plan"
     runs-on: ubuntu-latest
-    needs: 
+    needs:
       - terraform-validate
     steps:
     - name: Checkout
@@ -121,7 +121,7 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v1-node16
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}      
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: eu-west-3
 
     - name: terraform plan
@@ -133,6 +133,8 @@ jobs:
     - name: Post Plan
       if: always() && github.ref != 'refs/heads/master' && (steps.plan.outcome == 'success' || steps.plan.outcome == 'failure')
       uses: robburger/terraform-pr-commenter@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         commenter_type: plan
         commenter_input: ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
@@ -146,8 +148,8 @@ jobs:
 
   terraform-apply:
     name: "apply"
-    needs: 
-      - terraform-plan    
+    needs:
+      - terraform-plan
       # - tfsec
     runs-on: ubuntu-latest
     steps:
@@ -160,7 +162,7 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v1-node16
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}      
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: eu-west-3
 
     - name: terraform apply
@@ -171,7 +173,7 @@ jobs:
   bats-test:
     name: "bats-test"
     runs-on: ubuntu-latest
-    needs: terraform-apply    
+    needs: terraform-apply
     steps:
     - name: Checkout
       uses: actions/checkout@v3
@@ -179,7 +181,7 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v1-node16
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}      
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: eu-west-3
 
     - name: Install bats
@@ -192,7 +194,7 @@ jobs:
   terratest-todo:
     name: "terratest-todo"
     runs-on: ubuntu-latest
-    needs: terraform-apply    
+    needs: terraform-apply
     steps:
     - name: Run terratest-todo
       run: |
@@ -210,26 +212,26 @@ jobs:
       uses: aws-actions/configure-aws-credentials@v1-node16
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}      
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: eu-west-3
     - name: Terraform Destroy
       if: always()
       run: |
         terraform init
-        terraform destroy -auto-approve                
+        terraform destroy -auto-approve
 
   terraform-docs:
     name: "terraform-docs"
     runs-on: ubuntu-latest
-    needs: terraform-apply    
+    needs: terraform-apply
     steps:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - name: Render terraform docs inside the README.md and push changes back to PR branch    
+    - name: Render terraform docs inside the README.md and push changes back to PR branch
       uses: terraform-docs/gh-actions@v1.0.0
       with:
         working-dir: .
         output-file: README.md
         output-method: inject
-        git-push: "true"        
+        git-push: "true"
