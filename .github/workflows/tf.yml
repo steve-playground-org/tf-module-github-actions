@@ -21,25 +21,31 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-    - name: Check if files have been updated
-      uses: tj-actions/verify-changed-files@v12
-      id: verify-changed-files
+    - name: Get changed files
+      id: changed-files
+      uses: tj-actions/changed-files@v34      
       with:
-        files: |
-            VERSION
-        base_sha: ${{ github.event.pull_request.base.sha }}
-    - name: debug
+        # files: |
+        #     VERSION
+        # base_sha: ${{ github.event.pull_request.base.sha }}
+
+    - name: List all changed files
       run: |
-        echo "files_changed ${{ steps.verify-changed-files.outputs.files_changed }}"
-        echo "base_sha ${{ github.event.pull_request.base.sha }}"
         for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
           echo "$file was changed"
         done
-    - name: Fail if not changed!
-      if: steps.verify-changed-files.outputs.files_changed != 'true'
-      run: |
-        echo "VERSION file needs to be updated"  
-        exit 1          
+
+    # - name: Run step if any file(s) in the docs folder change
+    #   if: steps.changed-files-specific.outputs.any_changed == 'true'
+    #   run: |
+    #     echo "One or more files in the docs folder has changed."
+    #     echo "List all the files that have changed: ${{ steps.changed-files-specific.outputs.all_changed_files }}"        
+    # - name: Fail if not changed!
+    #   if: steps.verify-changed-files.outputs.files_changed != 'true'
+    #   run: |
+    #     echo "VERSION file needs to be updated"  
+    #     exit 1          
+
   # tfsec:
   #   name: "tfsec"
   #   runs-on: ubuntu-latest
