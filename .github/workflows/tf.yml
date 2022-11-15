@@ -58,7 +58,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}      
         aws-region: eu-west-3
 
-    - name: Terraform Plan
+    - name: terraform validate
       run: |
         terraform init
         terraform validate
@@ -78,7 +78,7 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}      
         aws-region: eu-west-3
 
-    - name: Terraform Plan
+    - name: terraform plan
       run: |
         terraform init
         terraform plan
@@ -112,6 +112,10 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}      
         aws-region: eu-west-3
+
+    - name: Run bats
+      run: |
+        npm install -g bats@1.8.2
     - name: Run bats
       run: |
         bats bats/aws-s3-ls.sh
