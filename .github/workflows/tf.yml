@@ -1,4 +1,5 @@
-name: 'Terraform - Global CD'
+# dynamic name
+name: 'Terraform Module Pipeline - ${{ env.GITHUB_REPOSITORY }}'
 
 on:
   push:
@@ -13,7 +14,7 @@ on:
 
 jobs:
   terraform:
-    name: Global CD
+    name: Global CD # dynamic name    
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -26,6 +27,9 @@ jobs:
       # https://github.com/aws-actions/configure-aws-credentials/issues/489
       uses: aws-actions/configure-aws-credentials@v1-node16
       with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}      
+        # TODO: OIDC trust instead of secrets
         # role-to-assume: arn:aws:iam::111111111111:role/github-oidc
         # role-duration-seconds: 900 - long enough to cover long running applies        
         aws-region: eu-west-3
@@ -39,3 +43,10 @@ jobs:
       run: |
         terraform init
         terraform apply -auto-approve        
+
+    - name: Terraform Destroy
+      run: |
+        terraform init
+        terraform destroy -auto-approve                
+        
+        # TODO: depends
