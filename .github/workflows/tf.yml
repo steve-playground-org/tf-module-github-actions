@@ -28,6 +28,11 @@ jobs:
       with:
         files: |
             VERSION
+    - name: Fail if not changed!
+      if: steps.verify-changed-files.outputs.files_changed != 'true'
+      run: |
+        echo "VERSION file needs to be updated"  
+        exit 1          
   # tfsec:
   #   name: "tfsec"
   #   runs-on: ubuntu-latest
