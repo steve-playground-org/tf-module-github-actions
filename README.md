@@ -1,4 +1,13 @@
 # tf-module-github-actions
+
+## Local testing
+
+Using the local invocation of the github actions runner [act](https://github.com/nektos/act) (requires docker)
+
+_NOTE: for similar compatibility to runner use <https://github.com/nektos/act#alternative-runner-images> - massive image!_
+
+add secrets using `act.secrets` with format:
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
