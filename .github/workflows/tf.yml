@@ -17,6 +17,16 @@ defaults:
     shell: bash
 
 jobs:
+  version-bumps:
+    runs-on: ubuntu-latest  
+    - name: Verify Changed files
+      steps:
+      - name: Checkout
+        uses: tj-actions/verify-changed-files@v12
+        id: verify-changed-files
+        with:
+          files: |
+              VERSION
   # tfsec:
   #   name: "tfsec"
   #   runs-on: ubuntu-latest
