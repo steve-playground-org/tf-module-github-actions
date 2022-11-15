@@ -26,6 +26,11 @@ jobs:
   #   - name: tfsec
   #     uses: aquasecurity/tfsec-action@v1.0.0
 
+      # - name: Setup Terraform
+      #   uses: hashicorp/setup-terraform@v1
+      #   with:
+      #     terraform_version: 0.15.0
+
   tflint:
     name: "tflint"
     runs-on: ubuntu-latest
@@ -42,6 +47,17 @@ jobs:
       run: tflint --init
     - name: Run TFLint
       run: tflint -f compact
+
+  terraform-fmt:
+    name: "terraform-fmt"
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Terraform Format
+      id: fmt
+      run: terraform fmt -check -recursive
+      continue-on-error: true
 
   terraform-validate:
     name: "validate"
@@ -81,7 +97,15 @@ jobs:
     - name: terraform plan
       run: |
         terraform init
-        terraform plan
+        terraform plan -out plan.out
+
+    - name: Post Plan
+      if: always() && github.ref != 'refs/heads/master' && (steps.plan.outcome == 'success' || steps.plan.outcome == 'failure')
+      uses: robburger/terraform-pr-commenter@v1
+      with:
+        commenter_type: plan
+        commenter_input: ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
+        commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
 
   terraform-apply:
     name: "apply"
@@ -98,6 +122,11 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}      
         aws-region: eu-west-3
+
+    - name: terraform apply
+      run: |
+        terraform init
+        terraform apply plan.out
 
   bats-test:
     name: "bats-test"
