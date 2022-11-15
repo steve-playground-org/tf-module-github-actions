@@ -31,7 +31,10 @@ jobs:
     - name: debug
       run: |
         echo "files_changed ${{ steps.verify-changed-files.outputs.files_changed }}"
-        echo "base_sha ${{ github.event.pull_request.base.sha }}
+        echo "base_sha ${{ github.event.pull_request.base.sha }}"
+        for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+          echo "$file was changed"
+        done
     - name: Fail if not changed!
       if: steps.verify-changed-files.outputs.files_changed != 'true'
       run: |
