@@ -1,0 +1,41 @@
+name: 'Terraform - Global CD'
+
+on:
+  push:
+    branches:
+      - initial
+      # TODO: only run CI on review?
+
+# required to use OIDC authentication
+# permissions:
+#   contents: read
+#   id-token: write
+
+jobs:
+  terraform:
+    name: Global CD
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: configure AWS credentials
+      # uses: aws-actions/configure-aws-credentials@v1
+      # https://github.com/aws-actions/configure-aws-credentials/issues/489
+      uses: aws-actions/configure-aws-credentials@v1-node16
+      with:
+        # role-to-assume: arn:aws:iam::111111111111:role/github-oidc
+        # role-duration-seconds: 900 - long enough to cover long running applies        
+        aws-region: eu-west-3
+
+    - name: Terraform Plan
+      run: |
+        terraform init
+        terraform plan
+
+    - name: Terraform Apply
+      run: |
+        terraform init
+        terraform apply -auto-approve        
