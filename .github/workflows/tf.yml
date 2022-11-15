@@ -17,6 +17,15 @@ defaults:
     shell: bash
 
 jobs:
+  tfsec:
+    name: "tfsec"
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: tfsec
+      uses: aquasecurity/tfsec-action@v1.0.0
+
   terraform-plan:
     name: "plan"
     runs-on: ubuntu-latest
