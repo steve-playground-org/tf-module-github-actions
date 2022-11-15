@@ -8,6 +8,17 @@ _NOTE: for similar compatibility to runner use <https://github.com/nektos/act#al
 
 add secrets using `act.secrets` with format:
 
+```ini
+AWS_ACCESS_KEY_ID=XXX
+AWS_SECRET_ACCESS_KEY=YY
+```
+
+add env vars using `act.env` with format:
+
+```ini
+ENV_KEY1=env_value_1
+```
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 

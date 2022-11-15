@@ -99,8 +99,8 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}      
         aws-region: eu-west-3
 
-  some-test:
-    name: "test"
+  bats-test:
+    name: "bats-test"
     runs-on: ubuntu-latest
     needs: terraform-apply    
     steps:
@@ -113,17 +113,27 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}      
         aws-region: eu-west-3
 
-    - name: Run bats
+    - name: Install bats
       run: |
         npm install -g bats@1.8.2
     - name: Run bats
       run: |
         bats bats/aws-s3-ls.sh
 
+  terratest-todo:
+    name: "terratest-todo"
+    runs-on: ubuntu-latest
+    needs: terraform-apply    
+    steps:
+    - name: Run terratest-todo
+      run: |
+        echo "Run something sensible"
+        echo "Reference - https://github.com/gruntwork-io/terratest-todo/blob/master/test/terraform_aws_s3_example_test.go"
+
   terraform-destroy:
     name: "destroy"
     runs-on: ubuntu-latest
-    needs: some-test
+    needs: bats-test
     steps:
     - name: Checkout
       uses: actions/checkout@v3
