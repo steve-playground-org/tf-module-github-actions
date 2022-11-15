@@ -1,5 +1,5 @@
-# dynamic name
-name: 'Terraform Module Pipeline - ${{ github.event.repository.name }}"'
+# dynamic name ?
+name: 'Terraform Module Pipeline'
 
 on:
   push:
@@ -14,7 +14,8 @@ on:
 
 jobs:
   terraform:
-    name: "Foo ${{ github.event.repository.name }}"
+    name: "plan-apply-delete"
+    # dynamic name? ${{ github.event.repository.name }}"
     runs-on: ubuntu-latest
     defaults:
       run:
