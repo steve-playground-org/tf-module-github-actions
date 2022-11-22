@@ -22,5 +22,5 @@ plugin "aws" {
 }
 
 rule "aws_instance_invalid_type" {
-  enabled = false
+  enabled = true
 }

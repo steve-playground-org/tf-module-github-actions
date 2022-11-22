@@ -1,6 +1,5 @@
 resource "aws_s3_bucket" "this" {
   bucket = "my-tf-test-bucket-ops-guru-123"
-  #tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-block-public-policy tfsec:ignore:aws-s3-ignore-public-acls tfsec:ignore:aws-s3-no-public-buckets tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning  tfsec:ignore:aws-s3-block-public-acls
 
   tags = {
     Name        = "My bucket"
@@ -8,7 +7,26 @@ resource "aws_s3_bucket" "this" {
   }
 }
 
-# resource "aws_s3_bucket_public_access_block" "this" {
-#   bucket = aws_s3_bucket.this.id
-#   block_public_acls = true
-# }
+resource "aws_s3_bucket_public_access_block" "this" {
+  bucket                  = aws_s3_bucket.this.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_kms_key" "this" {
+  description             = "This key is used to encrypt bucket objects"
+  deletion_window_in_days = 7
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "this" {
+  bucket = aws_s3_bucket.this.bucket
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.this.arn
+      sse_algorithm     = "aws:kms"
+    }
+  }
+}
