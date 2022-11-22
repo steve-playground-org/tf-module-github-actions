@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "this" {
-  bucket = "my-tf-test-bucket-ops-guru-123"
+  bucket = var.bucket_name
 
   tags = {
     Name        = "My bucket"

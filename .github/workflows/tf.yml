@@ -196,7 +196,9 @@ jobs:
         npm install -g bats@1.8.2
     - name: Run bats
       run: |
-        bats bats/aws-s3-ls.sh
+        bats tests/00-put-objects.sh
+        bats tests/10-bucket-access-configuration.sh
+        bats tests/99-empty-bucket.sh
 
   terratest-todo:
     name: "terratest-todo"
