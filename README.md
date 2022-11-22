@@ -1,6 +1,6 @@
 # tf-module-github-actions
 
-## Local testing
+## Local testing (partial)
 
 Using the local invocation of the github actions runner [act](https://github.com/nektos/act) (requires docker)
 
