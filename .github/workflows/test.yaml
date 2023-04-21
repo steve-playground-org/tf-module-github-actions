@@ -10,7 +10,7 @@ jobs:
       contents: read
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/stv-io/tg-gcp-ci-tools-image/tg-gcp-ci-tools-image:v0.1.4
+      image: ghcr.io/stv-io/tg-gcp-ci-tools-image/tg-gcp-ci-tools-image:v0.1.5
       options: --user root # https://github.com/actions/checkout/issues/1014
     steps:
       - uses: 'actions/checkout@v3'
