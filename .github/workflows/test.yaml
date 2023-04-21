@@ -22,5 +22,6 @@ jobs:
             && chmod 600 id_rsa known_hosts
             && ssh -i ./id_rsa -o UserKnownHostsFile=./known_hosts"
         run: | 
-          ls -ltrha id_rsa
-          ls -ltrha known_hosts
+          echo $GIT_SSH_COMMAND
+          ls -ltrha ./id_rsa
+          ls -ltrha ./known_hosts
