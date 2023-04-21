@@ -23,7 +23,7 @@ jobs:
         run: | 
           gpg --quiet --batch --yes --decrypt --passphrase="${{ secrets.GPG_PASSPHRASE }}" --output ./id_rsa .github/keys/id_rsa.gpg
           gpg --quiet --batch --yes --decrypt --passphrase="${{ secrets.GPG_PASSPHRASE }}" --output /home/tfuser/google_application_credentials .github/keys/application_default_credentials.json.gpg
-          chmod 600 known_hosts id_rsa
+          chmod 600 id_rsa
           export GOOGLE_APPLICATION_CREDENTIALS=/home/tfuser/google_application_credentials
           file /home/tfuser/google_application_credentials
           file ./id_rsa
