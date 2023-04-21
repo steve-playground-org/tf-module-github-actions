@@ -5,25 +5,25 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+  tflint:
     permissions:
       contents: read
-      id-token: write
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/stv-io/tg-gcp-ci-tools-image/tg-gcp-ci-tools-image:v0.1.4
       options: --user root # https://github.com/actions/checkout/issues/1014
     steps:
       - uses: 'actions/checkout@v3'
-      - name: test
+      - name: tflint
         env:
-          GIT_SSH_COMMAND: "ssh-keyscan github.com > known_hosts
-            && chmod 600 known_hosts
-            && ssh -i ./id_rsa -o UserKnownHostsFile=./known_hosts"
-        run: | 
-          gpg --quiet --batch --yes --decrypt --passphrase="${{ secrets.GPG_PASSPHRASE }}" --output ./id_rsa .github/keys/id_rsa.gpg
-          gpg --quiet --batch --yes --decrypt --passphrase="${{ secrets.GPG_PASSPHRASE }}" --output /home/tfuser/google_application_credentials .github/keys/application_default_credentials.json.gpg
-          chmod 600 id_rsa
-          export GOOGLE_APPLICATION_CREDENTIALS=/home/tfuser/google_application_credentials
-          ls -lrtha /home/tfuser/google_application_credentials
-          ls -lrtha ./id_rsa
+          # https://github.com/terraform-linters/tflint/blob/master/docs/user-guide/plugins.md#avoiding-rate-limiting
+          GITHUB_TOKEN: ${{ github.token }}
+          TFLINT_VERSION: "v0.46.0"
+        run: |            
+          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+          tflint --version & tflint --init
+
+          # tflint --version & tflint --init
+          #   tflint --recursive --config "$(pwd)/.tflint.hcl"
+  
+  
